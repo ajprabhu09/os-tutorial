@@ -11,3 +11,6 @@ Don't use the Xcode developer tools `nasm` if you have them installed, they won'
 
 On some systems qemu is split into multiple binaries. You may want
 to call `qemu-system-x86_64 binfile`
+
+GCC can compile assembly code using `gcc -c asm.S -o asm.o`
+

@@ -15,48 +15,48 @@ of the disk (cylinder 0, head 0, sector 0) and it takes 512 bytes.
 To make sure that the "disk is bootable", the BIOS checks that bytes
 511 and 512 of the alleged boot sector are bytes `0xAA55`.
 
-This is the simplest boot sector ever:
+Code
+----
+A simple bootloader would look like 
+```
+.global bootloader  # makes our label "init" available to the outside
+bootloader:         # this is the beginning of our binary later.
+  jmp bootloader    # jump to "init"
+
+.fill 510 - .-bootloader, 1, 0x00
+.byte 0x55
+.byte 0xaa
 
 ```
-e9 fd ff 00 00 00 00 00 00 00 00 00 00 00 00 00
-00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-[ 29 more lines with sixteen zero-bytes each ]
-00 00 00 00 00 00 00 00 00 00 00 00 00 00 55 aa
+Note that `.fill` and `.byte` macro which are GNU assembler directives more information here https://ftp.gnu.org/old-gnu/Manuals/gas-2.9.1/html_chapter/as_7.html
+
+Run `make` to create the `.bin` file which would be our bare bones bootloader
+
+`hexdump -C boot.bin` will show the hex values inside the binary. 
+
+To verify you may get something like this 
+```
+eb fe 00 00 00 00 00 00  
+00 00 00 00 00 00 00 00  
+00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 55 aa
+
 ```
 
-It is basically all zeros, ending with the 16-bit value
-`0xAA55` (beware of endianness, x86 is little-endian). 
-The first three bytes perform an infinite jump
+Note the trailing `55 aa`
 
-Simplest boot sector ever
--------------------------
+Running the Bootloader
+----
+the boot loader can be run on an emulator like qemu
 
-You can either write the above 512 bytes
-with a binary editor, or just write a very
-simple assembler code:
+to run it `make run`
 
-```nasm
-; Infinite loop (e9 fd ff)
-loop:
-    jmp loop 
+to exit out of the emulation type `Ctrl-A` then `C` then type in `quit`
 
-; Fill with 510 zeros minus the size of the previous code
-times 510-($-$$) db 0
-; Magic number
-dw 0xaa55 
-```
+``
 
-To compile:
-`nasm -f bin boot_sect_simple.asm -o boot_sect_simple.bin`
+try to play around with assembly file and try to break it 
 
-> OSX warning: if this drops an error, read chapter 00 again
 
-I know you're anxious to try it out (I am!), so let's do it:
-
-`qemu boot_sect_simple.bin`
-
-> On some systems, you may have to run `qemu-system-x86_64 boot_sect_simple.bin` If this gives an SDL error, try passing the --nographic and/or --curses flag(s).
-
-You will see a window open which says "Booting from Hard Disk..." and
-nothing else. When was the last time you were so excited to see an infinite
-loop? ;-)
