@@ -1,4 +1,3 @@
-*Concepts you may want to Google beforehand: assembler, BIOS*
 
 **Goal: Create a file which the BIOS interprets as a bootable disk**
 
