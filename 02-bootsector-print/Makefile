@@ -8,5 +8,8 @@ compile:
 clean: 
 	rm -rf *.bin *.o
 
-run:
+
+show: compile
+	hexdump -C boot.bin
+run: compile
 	qemu-system-x86_64 -nographic boot.bin
